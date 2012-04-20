@@ -1,7 +1,5 @@
 # Grunk: Grep for Splunk
-require 'json'
 require 'net/http'
-require 'net/https'
 require 'nokogiri'
 require 'uri'
 
