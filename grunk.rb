@@ -5,8 +5,6 @@ require 'net/https'
 require 'nokogiri'
 require 'uri'
 
-$SPLUNK_URI = 'https://splunk.shef.ac.uk:8089/services'
-
 class Splunk
   def initialize(splunk_uri,user,password)
     @uri = splunk_uri
