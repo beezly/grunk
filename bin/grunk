@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'splunk'
-require 'yaml'
-require 'nokogiri'
 require 'getopt/std'
 
 options = Hash.new
