@@ -1,0 +1,56 @@
+require 'rubygems'
+require 'splunk'
+require 'yaml'
+require 'nokogiri'
+require 'getopt/std'
+
+options = Hash.new
+options[:time] = false
+options[:show_source] = false
+options[:max_results] = 30
+options[:earliest_time] = '-1d'
+options[:latest_time] = 'now'
+
+opt = Getopt::Std.getopts "sdom:f:t:"
+
+if opt["t"]
+  options[:latest_time] = opt["t"]
+end 
+
+if opt["f"]
+  options[:earliest_time] = opt["f"]
+end
+
+if opt["s"]
+  options[:show_source] = true
+end
+
+if opt["d"]
+  options[:time] = true
+end
+
+if opt["o"]
+  options[:show_host] = true
+end
+
+if opt["m"]
+  options[:max_results] = opt["m"].to_i
+end
+
+config = YAML.load_file "#{ENV['HOME']}/.grunkrc"
+
+splunk = Splunk::Splunk.new config['splunk_server'], config['splunk_user'] , config['splunk_pass']
+results = splunk.search "#{ARGV[0]}", 'sort_key' => 'time', 'sort_dir' => 'asc', 'count' => options[:max_results], 'earliest_time' => options[:earliest_time], 'latest_time' => options[:latest_time]
+results.reverse!
+results.each do |result|
+  print "#{result[:_time]}: " if options[:time]
+  if options[:show_host] || options[:show_source]
+    print "("
+    print result[:host] if options[:show_host]
+    print ":" if options[:show_host] && options[:show_source]
+    print result[:source] if options[:show_source]
+    print ") "
+  end
+    
+  puts result[:_raw]
+end
