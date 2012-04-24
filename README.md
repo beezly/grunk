@@ -3,6 +3,13 @@ grunk
 
 Grunk is a tool for Splunk which has enables you to query a Splunk server from the command line using only the REST API. You do not need to have any of the Splunk binaries installed on your machine.
 
+Installation
+------------
+
+Requires Ruby and rubygems. Once you have those;
+
+    gem install grunk
+
 Configuration
 -------------
 
