@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'splunk'
+require 'splunk-sdk-ruby'
 require 'getopt/std'
 
 options = Hash.new
@@ -38,18 +38,18 @@ end
 
 config = YAML.load_file "#{ENV['HOME']}/.grunkrc"
 
-splunk = Splunk::Splunk.new config['splunk_server'], config['splunk_user'] , config['splunk_pass']
-results = splunk.search "#{ARGV[0]}", 'sort_key' => 'time', 'sort_dir' => 'asc', 'count' => options[:max_results], 'earliest_time' => options[:earliest_time], 'latest_time' => options[:latest_time]
-results.reverse!
+splunk = Splunk::Service.connect username: config["splunk_user"], password: config["splunk_pass"], host: config["splunk_host"], port: config["splunk_port"], protocol: config["splunk_protocol"]
+results  = splunk.jobs.create_oneshot "search #{ARGV[0]}", max_results: options[:max_results], earliest_time: options[:earliest_time], latest_time: options['latest_time']
+
 results.each do |result|
-  print "#{result[:_time]}: " if options[:time]
+  print "#{result["_time"]}: " if options[:time]
   if options[:show_host] || options[:show_source]
     print "("
-    print result[:host] if options[:show_host]
+    print result["host"] if options[:show_host]
     print ":" if options[:show_host] && options[:show_source]
-    print result[:source] if options[:show_source]
+    print result["source"] if options[:show_source]
     print ") "
   end
     
-  puts result[:_raw]
+  puts result["_raw"]
 end
