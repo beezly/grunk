@@ -36,10 +36,12 @@ if opt["m"]
   options[:max_results] = opt["m"].to_i
 end
 
-config = YAML.load_file "#{ENV['HOME']}/.grunkrc"
+rc_file = File.new(File.expand_path('~/.splunkrc'), "r")
+$config = eval(rc_file.read)
 
-splunk = Splunk::Service.connect username: config["splunk_user"], password: config["splunk_pass"], host: config["splunk_host"], port: config["splunk_port"], protocol: config["splunk_protocol"]
-results  = splunk.jobs.create_oneshot "search #{ARGV[0]}", max_results: options[:max_results], earliest_time: options[:earliest_time], latest_time: options['latest_time']
+service = Splunk::Service.new $config 
+service.login
+results  = service.jobs.create_oneshot "search #{ARGV[0]}", max_results: options[:max_results], earliest_time: options[:earliest_time], latest_time: options['latest_time']
 
 results.each do |result|
   print "#{result["_time"]}: " if options[:time]
