@@ -13,13 +13,18 @@ Requires Ruby and rubygems. Once you have those;
 Configuration
 -------------
 
-Grunk expects a configuration file in your home directory called .grunkrc
+Grunk expects a configuration file in your home directory called .splunkrc which follows the same format as the splunk-sdk-ruby .splunkrc file
 
-It should consist of three lines;
+It should look something like;
 
-    splunk_server: https://<your-splunk-server>:8089/services
-    splunk_user: <your splunk username>
-    splunk_pass: <your splunk password>
+{
+  :username => '<username>', 
+  :password => '<password>',
+  :port => '<management port>',
+  :host => '<host>',
+  :protocol => '<https or http>'
+}
+
 
 Usage
 -----
