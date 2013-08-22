@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'splunk-sdk-ruby'
+require 'json'
 require 'getopt/std'
 
 options = Hash.new
@@ -41,7 +42,8 @@ $config = eval(rc_file.read)
 
 service = Splunk::Service.new $config 
 service.login
-results  = service.jobs.create_oneshot "search #{ARGV[0]}", max_results: options[:max_results], earliest_time: options[:earliest_time], latest_time: options['latest_time']
+stream  = service.create_oneshot "search #{ARGV[0]}", max_results: options[:max_results], earliest_time: options[:earliest_time], latest_time: options['latest_time']
+results = Splunk::ResultsReader.new stream
 
 results.each do |result|
   print "#{result["_time"]}: " if options[:time]
