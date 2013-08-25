@@ -33,10 +33,10 @@ Usage
 
 Grunk can accept various options
 
- - -f <splunk time> 
+ - -e <splunk time> 
    A splunk style time indicating the earliest time of the search
 
- - -t <splunk time>
+ - -l <splunk time>
    A splunk style time indicating the latest time of the search
 
  - -d 
@@ -52,3 +52,7 @@ Example
 -------
 
     grunk -o 'error OR 404'
+
+Realtime queries work too (you can use grunk like tail -f):
+
+    grunk 'host=somehost sourcetype=mainlog' -e rt-10s -f rt

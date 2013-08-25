@@ -3,22 +3,22 @@ require 'rubygems'
 require 'splunk-sdk-ruby'
 require 'json'
 require 'getopt/std'
+require 'pp'
 
 options = Hash.new
 options[:time] = false
 options[:show_source] = false
-options[:max_results] = 30
 options[:earliest_time] = '-1d'
 options[:latest_time] = 'now'
 
-opt = Getopt::Std.getopts "sdom:f:t:"
+opt = Getopt::Std.getopts "sdom:e:l:"
 
-if opt["t"]
-  options[:latest_time] = opt["t"]
+if opt["l"]
+  options[:latest_time] = opt["l"]
 end 
 
-if opt["f"]
-  options[:earliest_time] = opt["f"]
+if opt["e"]
+  options[:earliest_time] = opt["e"]
 end
 
 if opt["s"]
@@ -33,27 +33,41 @@ if opt["o"]
   options[:show_host] = true
 end
 
-if opt["m"]
-  options[:max_results] = opt["m"].to_i
-end
-
 rc_file = File.new(File.expand_path('~/.splunkrc'), "r")
 $config = eval(rc_file.read)
 
 service = Splunk::Service.new $config 
 service.login
-stream  = service.create_oneshot "search #{ARGV[0]}", max_results: options[:max_results], earliest_time: options[:earliest_time], latest_time: options['latest_time']
-results = Splunk::ResultsReader.new stream
+job  = service.create_search "search #{ARGV[0]}", :earliest_time => options[:earliest_time], :latest_time => options[:latest_time]
 
-results.each do |result|
-  print "#{result["_time"]}: " if options[:time]
-  if options[:show_host] || options[:show_source]
-    print "("
-    print result["host"] if options[:show_host]
-    print ":" if options[:show_host] && options[:show_source]
-    print result["source"] if options[:show_source]
-    print ") "
+while !job.is_ready?
+  sleep 0.1
+end
+
+results_offset = 0
+finished = false
+
+until finished
+  if job.is_done?
+    finished=true
+    stream = job.results(:offset => results_offset, :count => 0) 
+  else 
+    stream = job.preview(:offset => results_offset, :count => 0)
   end
+
+  results = Splunk::ResultsReader.new stream
+  results.each do |result|
+    results_offset = results_offset + 1
+    print "#{result["_time"]}: " if options[:time]
+    if options[:show_host] || options[:show_source]
+      print "("
+      print result["host"] if options[:show_host]
+      print ":" if options[:show_host] && options[:show_source]
+      print result["source"] if options[:show_source]
+      print ") "
+    end
     
-  puts result["_raw"]
+    puts result["_raw"]
+  end 
+  sleep 1
 end
