@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name 	= 'grunk'
-  s.version	= '0.0.4'
+  s.version	= '0.0.6'
   s.date	= '2013-08-25'
   s.summary	= 'Grep for Splunk'
   s.description = 'Command Line interface to Splunk API'
