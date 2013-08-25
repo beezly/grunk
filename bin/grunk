@@ -8,10 +8,21 @@ require 'pp'
 options = Hash.new
 options[:time] = false
 options[:show_source] = false
-options[:earliest_time] = '-1d'
+options[:earliest_time] = '-15m'
 options[:latest_time] = 'now'
 
-opt = Getopt::Std.getopts "sdom:e:l:"
+opt = Getopt::Std.getopts "hsdo:e:l:"
+
+if opt['h']
+  puts "Usage: grunk [switches] 'search query'"
+  puts "  -h           Display help"
+  puts "  -s           Show source"
+  puts "  -d           Show timestamp"
+  puts "  -o           Show host"
+  puts "  -e time      Earliest time (Default: -15m)"
+  puts "  -l time      Latest time (Default: now)"
+  exit
+end
 
 if opt["l"]
   options[:latest_time] = opt["l"]
@@ -34,40 +45,50 @@ if opt["o"]
 end
 
 rc_file = File.new(File.expand_path('~/.splunkrc'), "r")
+unless rc_file
+  puts "Could not read .splunkrc file"
+  exit 255
+end
 $config = eval(rc_file.read)
 
 service = Splunk::Service.new $config 
 service.login
 job  = service.create_search "search #{ARGV[0]}", :earliest_time => options[:earliest_time], :latest_time => options[:latest_time]
 
-while !job.is_ready?
-  sleep 0.1
-end
-
-results_offset = 0
-finished = false
-
-until finished
-  if job.is_done?
-    finished=true
-    stream = job.results(:offset => results_offset, :count => 0) 
-  else 
-    stream = job.preview(:offset => results_offset, :count => 0)
+begin
+  while !job.is_ready?
+    sleep 0.1
   end
 
-  results = Splunk::ResultsReader.new stream
-  results.each do |result|
-    results_offset = results_offset + 1
-    print "#{result["_time"]}: " if options[:time]
-    if options[:show_host] || options[:show_source]
-      print "("
-      print result["host"] if options[:show_host]
-      print ":" if options[:show_host] && options[:show_source]
-      print result["source"] if options[:show_source]
-      print ") "
+  results_offset = 0
+  finished = false
+
+  until finished
+    if job.is_done?
+      finished=true
+      stream = job.results(:offset => results_offset, :count => 0) 
+    else 
+      stream = job.preview(:offset => results_offset, :count => 0)
     end
+
+    results = Splunk::ResultsReader.new stream
+    results.each do |result|
+      results_offset = results_offset + 1
+      print "#{result["_time"]}: " if options[:time]
+      if options[:show_host] || options[:show_source]
+        print "("
+        print result["host"] if options[:show_host]
+        print ":" if options[:show_host] && options[:show_source]
+        print result["source"] if options[:show_source]
+        print ") "
+      end
     
-    puts result["_raw"]
-  end 
-  sleep 1
+      puts result["_raw"]
+    end 
+    sleep 1
+  end
+rescue SystemExit, Interrupt
+  exit
+rescue Exception => e
+  raise
 end
