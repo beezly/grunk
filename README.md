@@ -55,4 +55,4 @@ Example
 
 Realtime queries work too (you can use grunk like tail -f):
 
-    grunk 'host=somehost sourcetype=mainlog' -e rt-10s -f rt
+    grunk -e rt-10s -f rt 'host=somehost sourcetype=mainlog'
