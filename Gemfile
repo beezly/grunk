@@ -1,4 +1,3 @@
-source :rubygems
+source 'https://rubygems.org'
 
-gem 'splunk-sdk-ruby', :path => "~/git/splunk-sdk-ruby"
-gem 'getopt'
+gemspec
