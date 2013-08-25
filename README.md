@@ -1,6 +1,8 @@
 grunk
 =====
 
+[![Gem Version](https://badge.fury.io/rb/grunk.png)](http://badge.fury.io/rb/grunk)
+
 Grunk is a tool for Splunk which has enables you to query a Splunk server from the command line using only the REST API. You do not need to have any of the Splunk binaries installed on your machine.
 
 Installation
