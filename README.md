@@ -17,13 +17,13 @@ Grunk expects a configuration file in your home directory called .splunkrc which
 
 It should look something like;
 
-{
-  :username => '<username>', 
-  :password => '<password>',
-  :port => '<management port>',
-  :host => '<host>',
-  :protocol => '<https or http>'
-}
+    {
+      :username => '<username>', 
+      :password => '<password>',
+      :port => '<management port>',
+      :host => '<host>',
+      :protocol => '<https or http>'
+    }
 
 
 Usage
