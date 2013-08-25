@@ -1,9 +1,10 @@
 Gem::Specification.new do |s|
   s.name 	= 'grunk'
-  s.version	= '0.0.3'
-  s.date	= '2013-08-23'
+  s.version	= '0.0.4'
+  s.date	= '2013-08-25'
   s.summary	= 'Grep for Splunk'
   s.description = 'Command Line interface to Splunk API'
+  s.license     = 'GPL-3'
   s.authors 	= ["Andrew Beresford"]
   s.email	= 'beezly@beez.ly'
   s.executables << 'grunk'
