@@ -8,7 +8,7 @@ Grunk is a tool for Splunk which has enables you to query a Splunk server from t
 Installation
 ------------
 
-Requires Ruby and rubygems. Once you have those;
+Requires Ruby >= 1.9.3 and rubygems. Once you have those;
 
     gem install grunk
 
